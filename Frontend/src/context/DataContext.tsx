@@ -13,6 +13,7 @@ interface DataContextType {
   dodajProdukciju: (produkcija: Omit<ProdukcijaMlijeka, 'id'>) => void;
   dodajZdravstveniZapis: (zapis: Omit<ZdravstveniZapis, 'id'>) => void;
   označiUpozorenjeKaoPročitano: (id: string) => void;
+  označiSvaUpozorenjaKaoPročitana: () => void;
   ažurirajZadatak: (id: string, zadatak: Partial<Zadatak>) => void;
 }
 
@@ -290,6 +291,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setUpozorenja(upozorenja.map(u => u.id === id ? { ...u, pročitano: true } : u));
   };
 
+  const označiSvaUpozorenjaKaoPročitana = () => {
+    setUpozorenja(upozorenja.map(u => ({ ...u, pročitano: true })));
+  };
+
   const ažurirajZadatak = (id: string, promjene: Partial<Zadatak>) => {
     setZadaci(zadaci.map(z => z.id === id ? { ...z, ...promjene } : z));
   };
@@ -308,6 +313,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         dodajProdukciju,
         dodajZdravstveniZapis,
         označiUpozorenjeKaoPročitano,
+        označiSvaUpozorenjaKaoPročitana,
         ažurirajZadatak,
       }}
     >

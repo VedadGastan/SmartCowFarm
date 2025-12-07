@@ -1,6 +1,7 @@
 import { ArrowLeft, Printer, Download, Share2 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Page } from '../App';
+import { useSettings } from '../context/SettingsContext';
 
 interface ReportDetailProps {
   reportType: string;
@@ -32,6 +33,15 @@ const sessionData = [
 ];
 
 export function ReportDetail({ reportType, onNavigate }: ReportDetailProps) {
+  const { formatNumber, formatDate } = useSettings();
+
+  const formatLiters = (value: number, fractionDigits = 1) =>
+    `${formatNumber(value, { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits })} L`;
+
+  const reportDate = new Date('2025-12-07');
+  const periodStart = new Date('2025-11-07');
+  const periodEnd = new Date('2025-12-07');
+
   const getReportTitle = () => {
     switch (reportType) {
       case 'milk-production': return 'Milk Production Report';
@@ -91,7 +101,7 @@ export function ReportDetail({ reportType, onNavigate }: ReportDetailProps) {
               </div>
               <div className="text-right">
                 <p className="text-gray-600">Report Generated</p>
-                <p className="text-gray-900">December 7, 2025</p>
+                <p className="text-gray-900">{formatDate(reportDate)}</p>
               </div>
             </div>
 
@@ -100,7 +110,7 @@ export function ReportDetail({ reportType, onNavigate }: ReportDetailProps) {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <p className="text-gray-600">Period</p>
-                  <p className="text-gray-900">Nov 7, 2025 - Dec 7, 2025</p>
+                  <p className="text-gray-900">{formatDate(periodStart)} - {formatDate(periodEnd)}</p>
                 </div>
                 <div>
                   <p className="text-gray-600">Prepared by</p>
@@ -108,7 +118,7 @@ export function ReportDetail({ reportType, onNavigate }: ReportDetailProps) {
                 </div>
                 <div>
                   <p className="text-gray-600">Total Cows</p>
-                  <p className="text-gray-900">123 cows</p>
+                  <p className="text-gray-900">{formatNumber(123)} cows</p>
                 </div>
               </div>
             </div>
@@ -120,22 +130,22 @@ export function ReportDetail({ reportType, onNavigate }: ReportDetailProps) {
             <div className="grid grid-cols-4 gap-6">
               <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                 <p className="text-gray-600 mb-1">Total Milk Production</p>
-                <h3 className="text-gray-900">93,600 L</h3>
+                <h3 className="text-gray-900">{formatLiters(93600, 0)}</h3>
                 <p className="text-green-600">+8.5% vs last period</p>
               </div>
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                 <p className="text-gray-600 mb-1">Daily Average</p>
-                <h3 className="text-gray-900">3,120 L</h3>
+                <h3 className="text-gray-900">{formatLiters(3120, 0)}</h3>
                 <p className="text-blue-600">Above target</p>
               </div>
               <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
                 <p className="text-gray-600 mb-1">Avg per Cow</p>
-                <h3 className="text-gray-900">31.8 L</h3>
+                <h3 className="text-gray-900">{formatLiters(31.8)}</h3>
                 <p className="text-purple-600">Excellent</p>
               </div>
               <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
                 <p className="text-gray-600 mb-1">Quality Score</p>
-                <h3 className="text-gray-900">96.8/100</h3>
+                <h3 className="text-gray-900">{formatNumber(96.8, { maximumFractionDigits: 1 })}/100</h3>
                 <p className="text-amber-600">High quality</p>
               </div>
             </div>
@@ -213,18 +223,18 @@ export function ReportDetail({ reportType, onNavigate }: ReportDetailProps) {
                     <tr key={row.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 text-gray-900">{row.id}</td>
                       <td className="px-4 py-3 text-gray-900">{row.cow}</td>
-                      <td className="px-4 py-3 text-right text-gray-900">{row.sessions}</td>
-                      <td className="px-4 py-3 text-right text-gray-900">{row.totalMilk.toLocaleString()}</td>
-                      <td className="px-4 py-3 text-right text-gray-900">{row.avgPerSession}</td>
-                      <td className="px-4 py-3 text-right text-green-600">{row.quality}</td>
+                      <td className="px-4 py-3 text-right text-gray-900">{formatNumber(row.sessions)}</td>
+                      <td className="px-4 py-3 text-right text-gray-900">{formatNumber(row.totalMilk)}</td>
+                      <td className="px-4 py-3 text-right text-gray-900">{formatNumber(row.avgPerSession, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
+                      <td className="px-4 py-3 text-right text-green-600">{formatNumber(row.quality, { maximumFractionDigits: 1 })}</td>
                     </tr>
                   ))}
                   <tr className="bg-gray-100">
                     <td colSpan={2} className="px-4 py-3 text-gray-900">Total / Average</td>
-                    <td className="px-4 py-3 text-right text-gray-900">300</td>
-                    <td className="px-4 py-3 text-right text-gray-900">9,126</td>
-                    <td className="px-4 py-3 text-right text-gray-900">30.4</td>
-                    <td className="px-4 py-3 text-right text-green-600">96.6</td>
+                    <td className="px-4 py-3 text-right text-gray-900">{formatNumber(300)}</td>
+                    <td className="px-4 py-3 text-right text-gray-900">{formatNumber(9126)}</td>
+                    <td className="px-4 py-3 text-right text-gray-900">{formatNumber(30.4, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
+                    <td className="px-4 py-3 text-right text-green-600">{formatNumber(96.6, { maximumFractionDigits: 1 })}</td>
                   </tr>
                 </tbody>
               </table>

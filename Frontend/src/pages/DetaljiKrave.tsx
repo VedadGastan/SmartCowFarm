@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit, Activity, Milk, Calendar, Weight, AlertCircle } from 'lucide-react';
 import { useData } from '../context/DataContext';
+import { useSettings } from '../context/SettingsContext';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Mock podaci za proizvodnju
@@ -18,6 +19,7 @@ export function DetaljiKrave() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { krave } = useData();
+  const { formatDate, formatNumber } = useSettings();
   
   const krava = krave.find(k => k.id === id);
 
@@ -75,11 +77,11 @@ export function DetaljiKrave() {
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Starost</p>
-              <p className="text-lg font-semibold text-gray-900">{krava.starost} god.</p>
+              <p className="text-lg font-semibold text-gray-900">{formatNumber(krava.starost, { maximumFractionDigits: 0 })} god.</p>
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Težina</p>
-              <p className="text-lg font-semibold text-gray-900">{krava.tezina} kg</p>
+              <p className="text-lg font-semibold text-gray-900">{formatNumber(krava.tezina)} kg</p>
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Status</p>
@@ -94,12 +96,12 @@ export function DetaljiKrave() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Datum rođenja</p>
               <p className="text-lg font-semibold text-gray-900">
-                {new Date(krava.datumRodjenja).toLocaleDateString('bs-BA')}
+                {formatDate(krava.datumRodjenja)}
               </p>
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Prosječna proizvodnja</p>
-              <p className="text-lg font-semibold text-gray-900">{krava.prosjecnaProdukcija.toFixed(1)} L/dan</p>
+              <p className="text-lg font-semibold text-gray-900">{formatNumber(krava.prosjecnaProdukcija, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} L/dan</p>
             </div>
           </div>
 
@@ -121,7 +123,7 @@ export function DetaljiKrave() {
               <div>
                 <p className="text-sm text-gray-600">Zadnja proizvodnja</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {krava.zadnjaProdukcija?.toFixed(1) || 'N/A'} L
+                  {krava.zadnjaProdukcija !== undefined ? `${formatNumber(krava.zadnjaProdukcija, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} L` : 'N/A'}
                 </p>
               </div>
             </div>
@@ -136,7 +138,7 @@ export function DetaljiKrave() {
                 <p className="text-sm text-gray-600">Zadnji pregled</p>
                 <p className="text-lg font-semibold text-gray-900">
                   {krava.zadnjiPregled 
-                    ? new Date(krava.zadnjiPregled).toLocaleDateString('bs-BA')
+                    ? formatDate(krava.zadnjiPregled)
                     : 'N/A'}
                 </p>
               </div>
@@ -152,7 +154,7 @@ export function DetaljiKrave() {
                 <p className="text-sm text-gray-600">Vakcinacija</p>
                 <p className="text-lg font-semibold text-gray-900">
                   {krava.zadnjeVakcinisanje 
-                    ? new Date(krava.zadnjeVakcinisanje).toLocaleDateString('bs-BA')
+                    ? formatDate(krava.zadnjeVakcinisanje)
                     : 'N/A'}
                 </p>
               </div>

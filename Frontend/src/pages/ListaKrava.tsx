@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, Edit, Trash2, Eye } from 'lucide-react';
 import { useData } from '../context/DataContext';
+import { useSettings } from '../context/SettingsContext';
 
 export function ListaKrava() {
   const navigate = useNavigate();
   const { krave, obrišiKravu } = useData();
+  const { formatDate, formatNumber } = useSettings();
   const [pretraga, setPretraga] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('sve');
 
@@ -144,10 +146,12 @@ export function ListaKrava() {
                   <td className="px-6 py-4 text-sm text-gray-700">{krava.pasmina}</td>
                   <td className="px-6 py-4 text-sm text-gray-700">{krava.starost} god.</td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                      ${krava.status === 'zdrava' ? 'bg-green-100 text-green-800' : 
-                        krava.status === 'lijecenje' ? 'bg-red-100 text-red-800' : 
-                        'bg-yellow-100 text-yellow-800'}`}
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border
+                      ${krava.status === 'zdrava'
+                        ? 'bg-transparent border-green-400 text-green-200'
+                        : krava.status === 'lijecenje'
+                          ? 'bg-transparent border-red-400 text-red-200'
+                          : 'bg-transparent border-amber-400 text-amber-200'}`}
                     >
                       {krava.status.charAt(0).toUpperCase() + krava.status.slice(1)}
                     </span>
@@ -155,16 +159,16 @@ export function ListaKrava() {
                   <td className="px-6 py-4">
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {krava.zadnjaProdukcija?.toFixed(1) || 'N/A'}
+                        {krava.zadnjaProdukcija !== undefined ? formatNumber(krava.zadnjaProdukcija, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : 'N/A'}
                       </p>
                       <p className="text-xs text-gray-500">
-                        Prosjek: {krava.prosjecnaProdukcija.toFixed(1)}
+                        Prosjek: {formatNumber(krava.prosjecnaProdukcija, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                       </p>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700">
                     {krava.zadnjiPregled 
-                      ? new Date(krava.zadnjiPregled).toLocaleDateString('bs-BA')
+                      ? formatDate(krava.zadnjiPregled)
                       : 'N/A'}
                   </td>
                   <td className="px-6 py-4">

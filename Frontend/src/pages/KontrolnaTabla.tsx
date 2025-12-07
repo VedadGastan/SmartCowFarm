@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Milk, Activity, AlertTriangle, CheckSquare, TrendingUp, TrendingDown } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useData } from '../context/DataContext';
+import { useSettings } from '../context/SettingsContext';
 
 const podaciProdukcije = [
   { datum: '1 Dec', litri: 2850 },
@@ -25,6 +26,7 @@ const zoneStaje = [
 export function KontrolnaTabla() {
   const navigate = useNavigate();
   const { krave, upozorenja, zadaci } = useData();
+  const { formatDate, formatNumber } = useSettings();
 
   const ukupnoKrava = krave.length;
   const kraveNaMuži = krave.filter(k => k.status !== 'lijecenje').length;
@@ -66,7 +68,7 @@ export function KontrolnaTabla() {
               <p className="text-sm text-gray-600 mb-1">Krave na muži</p>
               <h3 className="text-3xl font-bold text-gray-900 mb-2">{kraveNaMuži}</h3>
               <div className="flex items-center gap-1 text-sm text-gray-600">
-                <span>{Math.round((kraveNaMuži / ukupnoKrava) * 100)}% stada</span>
+                <span>{formatNumber(Math.round((kraveNaMuži / ukupnoKrava) * 100))}% stada</span>
               </div>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -80,7 +82,7 @@ export function KontrolnaTabla() {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Mlijeko danas (L)</p>
-              <h3 className="text-3xl font-bold text-gray-900 mb-2">3,200</h3>
+              <h3 className="text-3xl font-bold text-gray-900 mb-2">{formatNumber(3200)}</h3>
               <div className="flex items-center gap-1 text-sm text-green-600">
                 <TrendingUp className="w-4 h-4" />
                 <span>+4.8% u odnosu na juče</span>
@@ -259,7 +261,7 @@ export function KontrolnaTabla() {
                       {zadatak.prioritet.charAt(0).toUpperCase() + zadatak.prioritet.slice(1)} prioritet
                     </span>
                     <span className="text-xs text-gray-500">
-                      Rok: {new Date(zadatak.rokIzvršenja).toLocaleDateString('bs-BA')}
+                      Rok: {formatDate(zadatak.rokIzvršenja)}
                     </span>
                   </div>
                 </div>

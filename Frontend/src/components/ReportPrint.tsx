@@ -1,6 +1,7 @@
 import { X, Printer } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Page } from '../App';
+import { useSettings } from '../context/SettingsContext';
 
 interface ReportPrintProps {
   reportType: string;
@@ -32,6 +33,11 @@ const sessionData = [
 ];
 
 export function ReportPrint({ reportType, onNavigate }: ReportPrintProps) {
+  const { formatNumber } = useSettings();
+
+  const formatLiters = (value: number, fractionDigits = 1) =>
+    `${formatNumber(value, { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits })} L`;
+
   const getReportTitle = () => {
     switch (reportType) {
       case 'milk-production': return 'Milk Production Report';
@@ -119,17 +125,17 @@ export function ReportPrint({ reportType, onNavigate }: ReportPrintProps) {
               </div>
               <div className="border-2 border-blue-500 rounded-lg p-4">
                 <p className="text-gray-600 mb-1">Daily Average</p>
-                <h3 className="text-gray-900">3,120 L</h3>
+                <h3 className="text-gray-900">{formatLiters(3120, 0)}</h3>
                 <p className="text-blue-600">Above target</p>
               </div>
               <div className="border-2 border-purple-500 rounded-lg p-4">
                 <p className="text-gray-600 mb-1">Avg per Cow</p>
-                <h3 className="text-gray-900">31.8 L</h3>
+                <h3 className="text-gray-900">{formatLiters(31.8)}</h3>
                 <p className="text-purple-600">Excellent</p>
               </div>
               <div className="border-2 border-amber-500 rounded-lg p-4">
                 <p className="text-gray-600 mb-1">Quality Score</p>
-                <h3 className="text-gray-900">96.8/100</h3>
+                <h3 className="text-gray-900">{formatNumber(96.8, { maximumFractionDigits: 1 })}/100</h3>
                 <p className="text-amber-600">High</p>
               </div>
             </div>
@@ -203,18 +209,18 @@ export function ReportPrint({ reportType, onNavigate }: ReportPrintProps) {
                   <tr key={row.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="border border-gray-300 px-4 py-2 text-gray-900">{row.id}</td>
                     <td className="border border-gray-300 px-4 py-2 text-gray-900">{row.cow}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{row.sessions}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{row.totalMilk.toLocaleString()}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{row.avgPerSession}</td>
-                    <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{row.quality}</td>
+                    <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{formatNumber(row.sessions)}</td>
+                    <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{formatNumber(row.totalMilk)}</td>
+                    <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{formatNumber(row.avgPerSession, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
+                    <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{formatNumber(row.quality, { maximumFractionDigits: 1 })}</td>
                   </tr>
                 ))}
                 <tr className="bg-gray-200">
                   <td colSpan={2} className="border border-gray-300 px-4 py-2 text-gray-900">Total / Average</td>
-                  <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">300</td>
-                  <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">9,126</td>
-                  <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">30.4</td>
-                  <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">96.6</td>
+                  <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{formatNumber(300)}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{formatNumber(9126)}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{formatNumber(30.4, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-right text-gray-900">{formatNumber(96.6, { maximumFractionDigits: 1 })}</td>
                 </tr>
               </tbody>
             </table>

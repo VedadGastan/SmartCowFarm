@@ -1,10 +1,11 @@
 import { HeartPulse, Stethoscope, Syringe, CalendarClock, AlertTriangle, Baby, Pill } from 'lucide-react';
+import { useSettings } from '../context/SettingsContext';
 
 const healthKpi = [
-  { icon: HeartPulse, label: 'Zdrave krave', value: '112', detail: '+3 vs prošli mjesec', tone: 'bg-green-50 text-green-700 border-green-100' },
-  { icon: Syringe, label: 'Na liječenju', value: '3', detail: '2 antibiotik, 1 kontrola', tone: 'bg-amber-50 text-amber-700 border-amber-100' },
-  { icon: Stethoscope, label: 'Pregledi 30d', value: '27', detail: '92% završeno', tone: 'bg-blue-50 text-blue-700 border-blue-100' },
-  { icon: Baby, label: 'Repro ciklusi', value: '8 u toku', detail: '4 AI zakazana', tone: 'bg-purple-50 text-purple-700 border-purple-100' },
+  { icon: HeartPulse, label: 'Zdrave krave', value: '112', detail: '+3 vs prošli mjesec' },
+  { icon: Syringe, label: 'Na liječenju', value: '3', detail: '2 antibiotik, 1 kontrola' },
+  { icon: Stethoscope, label: 'Pregledi 30d', value: '27', detail: '92% završeno' },
+  { icon: Baby, label: 'Repro ciklusi', value: '8 u toku', detail: '4 AI zakazana' },
 ];
 
 const treatments = [
@@ -27,24 +28,41 @@ const risks = [
 ];
 
 export function ZdravljeReprodukcija() {
+  const { isDarkMode } = useSettings();
+  const cardBg = isDarkMode ? '#0f1727' : '#ffffff';
+  const cardBorder = isDarkMode ? '#1c2436' : '#e5e7eb';
+  const cardText = isDarkMode ? '#e7eefc' : '#0f1727';
+  const subText = isDarkMode ? '#b9c7e3' : '#4b5563';
+  const badgeText = isDarkMode ? '#9ad8a8' : '#0f766e';
+
   return (
     <div className="p-6 md:p-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Zdravlje i reprodukcija</h1>
-        <p className="text-gray-600 mt-1">Praćenje tretmana, reproduktivnih ciklusa i rizičnih slučajeva</p>
+        <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Zdravlje i reprodukcija</h1>
+        <p className={`mt-1 ${isDarkMode ? 'text-slate-200' : 'text-gray-600'}`}>Praćenje tretmana, reproduktivnih ciklusa i rizičnih slučajeva</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {healthKpi.map(({ icon: Icon, label, value, detail, tone }) => (
-          <div key={label} className={`rounded-xl border ${tone} p-4 shadow-sm`}>
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-white/80 flex items-center justify-center border border-current/20">
-                <Icon className="h-5 w-5" />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6">
+        {healthKpi.map(({ icon: Icon, label, value, detail }) => (
+          <div
+            key={label}
+            className="rounded-xl border p-5 shadow-lg"
+            style={{ backgroundColor: cardBg, borderColor: cardBorder, color: cardText }}
+          >
+            <div className="flex items-center gap-3 pl-4">
+              <div
+                className="h-10 w-10 rounded-lg flex items-center justify-center border text-white"
+                style={{
+                  backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : '#0f1727',
+                  borderColor: isDarkMode ? 'rgba(255,255,255,0.35)' : '#0f1727',
+                }}
+              >
+                <Icon className="h-5 w-5 drop-shadow" style={{ color: '#ffffff', opacity: 1 }} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">{label}</p>
-                <p className="text-2xl font-semibold text-gray-900">{value}</p>
-                <p className="text-xs mt-1">{detail}</p>
+                <p className="text-sm leading-tight" style={{ color: subText }}>{label}</p>
+                <p className="text-2xl font-semibold leading-snug" style={{ color: cardText }}>{value}</p>
+                <p className="text-xs mt-1 leading-tight" style={{ color: badgeText }}>{detail}</p>
               </div>
             </div>
           </div>

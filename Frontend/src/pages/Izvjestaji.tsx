@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Calendar, Download, FileText, Filter, LineChart as LineIcon, Printer, Share2 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useData } from '../context/DataContext';
+import { useSettings } from '../context/SettingsContext';
 
 const milkTrend = [
   { date: '11.11', liters: 2860 },
@@ -37,6 +38,12 @@ export function Izvjestaji() {
   const [range, setRange] = useState('last-30');
   const [type, setType] = useState('milk');
   const { krave } = useData();
+  const { isDarkMode } = useSettings();
+
+  const panelBg = isDarkMode ? '#0f1727' : '#ffffff';
+  const panelBorder = isDarkMode ? '#1c2436' : '#e5e7eb';
+  const panelText = isDarkMode ? '#e7eefc' : '#0f1727';
+  const subText = isDarkMode ? '#b9c7e3' : '#4b5563';
 
   const healthSplit = useMemo(() => ([
     { name: 'Zdrave', value: krave.filter(k => k.status === 'zdrava').length, color: '#10b981' },
@@ -50,19 +57,19 @@ export function Izvjestaji() {
   );
 
   const kpi = useMemo(() => ([
-    { label: 'Ukupna proizvodnja', value: '93.6k L', delta: '+8.5%', tone: 'text-green-600 bg-green-50 border-green-100' },
-    { label: 'Prosjek po grlu', value: '31.8 L', delta: 'Odlično', tone: 'text-blue-600 bg-blue-50 border-blue-100' },
-    { label: 'Kvalitet mlijeka', value: '96.8 /100', delta: 'Stabilno', tone: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
-    { label: 'Zdravstveni score', value: '92 /100', delta: 'Uzlazno', tone: 'text-purple-600 bg-purple-50 border-purple-100' },
-  ]), []);
+    { label: 'Ukupna proizvodnja', value: '93.6k L', delta: '+8.5%', deltaClass: isDarkMode ? 'text-emerald-300' : 'text-emerald-700' },
+    { label: 'Prosjek po grlu', value: '31.8 L', delta: 'Odlično', deltaClass: isDarkMode ? 'text-blue-200' : 'text-blue-700' },
+    { label: 'Kvalitet mlijeka', value: '96.8 /100', delta: 'Stabilno', deltaClass: isDarkMode ? 'text-emerald-200' : 'text-emerald-700' },
+    { label: 'Zdravstveni score', value: '92 /100', delta: 'Uzlazno', deltaClass: isDarkMode ? 'text-purple-200' : 'text-purple-700' },
+  ]), [isDarkMode]);
 
   return (
-    <div className="p-6 md:p-8 space-y-8">
+    <div className="p-6 md:p-8 space-y-10">
       {/* Header + actions */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Izvještaji</h1>
-          <p className="text-gray-600 mt-1">Pregled, izvoz i print ključnih metrika farme</p>
+          <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Izvještaji</h1>
+          <p className={`mt-1 ${isDarkMode ? 'text-slate-200' : 'text-gray-600'}`}>Pregled, izvoz i print ključnih metrika farme</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50">
@@ -78,28 +85,43 @@ export function Izvjestaji() {
       </div>
 
       {/* Filters */}
-      <div className="grid gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:grid-cols-3">
+      <div
+        className="grid gap-4 rounded-xl border p-6 shadow-sm md:grid-cols-3"
+        style={{ borderColor: panelBorder, backgroundColor: panelBg, color: panelText }}
+      >
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Tip izvještaja</label>
+          <label className="text-sm font-medium" style={{ color: subText }}>Tip izvještaja</label>
           <select
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            style={{
+              color: isDarkMode ? '#e7eefc' : '#0f1727',
+              backgroundColor: isDarkMode ? '#111a2a' : '#ffffff',
+              border: `1px solid ${isDarkMode ? '#2c3447' : '#e5e7eb'}`,
+            }}
             value={type}
             onChange={(e) => setType(e.target.value)}
           >
-            <option value="milk">Proizvodnja mlijeka</option>
-            <option value="health">Zdravlje i tretmani</option>
-            <option value="sensors">Senzori i okolina</option>
-            <option value="tasks">Produktivnost zadataka</option>
-            <option value="annual">Godišnji pregled</option>
+            <option value="milk" className={isDarkMode ? 'bg-[#111a2a] text-[#e7eefc]' : ''}>Proizvodnja mlijeka</option>
+            <option value="health" className={isDarkMode ? 'bg-[#111a2a] text-[#e7eefc]' : ''}>Zdravlje i tretmani</option>
+            <option value="sensors" className={isDarkMode ? 'bg-[#111a2a] text-[#e7eefc]' : ''}>Senzori i okolina</option>
+            <option value="tasks" className={isDarkMode ? 'bg-[#111a2a] text-[#e7eefc]' : ''}>Produktivnost zadataka</option>
+            <option value="annual" className={isDarkMode ? 'bg-[#111a2a] text-[#e7eefc]' : ''}>Godišnji pregled</option>
           </select>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Period</label>
-          <div className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2">
-            <Calendar className="w-4 h-4 text-gray-500" />
+          <label className="text-sm font-medium" style={{ color: subText }}>Period</label>
+          <div
+            className="flex items-center gap-2 rounded-lg px-3 py-2"
+            style={{
+              border: `1px solid ${isDarkMode ? '#2c3447' : '#e5e7eb'}`,
+              backgroundColor: isDarkMode ? '#111a2a' : '#ffffff',
+            }}
+          >
+            <Calendar className="w-4 h-4" style={{ color: subText }} />
             <select
               className="w-full bg-transparent focus:outline-none"
+              style={{ color: isDarkMode ? '#e7eefc' : '#0f1727' }}
               value={range}
               onChange={(e) => setRange(e.target.value)}
             >
@@ -113,24 +135,55 @@ export function Izvjestaji() {
         </div>
 
         <div className="space-y-3 md:pt-6">
-          <div className="flex flex-wrap gap-2 text-sm text-gray-600">
-            <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1"><Filter className="w-4 h-4" /> Zona B1/B2</span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1">Grupa: Muža</span>
+          <div className="flex flex-wrap gap-2 text-sm" style={{ color: subText }}>
+            <span
+              className="inline-flex items-center gap-1 rounded-full px-3 py-1 border"
+              style={{
+                backgroundColor: isDarkMode ? '#182235' : '#f1f5f9',
+                borderColor: isDarkMode ? '#2c3447' : '#e5e7eb',
+                color: isDarkMode ? '#e7eefc' : '#0f1727',
+              }}
+            >
+              <Filter className="w-4 h-4" /> Zona B1/B2
+            </span>
+            <span
+              className="inline-flex items-center gap-1 rounded-full px-3 py-1 border"
+              style={{
+                backgroundColor: isDarkMode ? '#182235' : '#f1f5f9',
+                borderColor: isDarkMode ? '#2c3447' : '#e5e7eb',
+                color: isDarkMode ? '#e7eefc' : '#0f1727',
+              }}
+            >
+              Grupa: Muža
+            </span>
           </div>
-          <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50">
+          <button
+            className="inline-flex items-center gap-2 rounded-lg border px-3 py-2"
+            style={{
+              borderColor: isDarkMode ? '#2c3447' : '#e5e7eb',
+              backgroundColor: isDarkMode ? '#182235' : '#f8fafc',
+              color: isDarkMode ? '#e7eefc' : '#0f1727',
+            }}
+          >
             <LineIcon className="w-4 h-4" /> Generiši pregled
           </button>
         </div>
       </div>
 
       {/* KPI cards */}
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mt-4 mb-6">
         {kpi.map((item) => (
-          <div key={item.label} className={`rounded-xl border ${item.tone} p-4 shadow-sm`}>
-            <p className="text-sm text-gray-600">{item.label}</p>
+          <div
+            key={item.label}
+            className="rounded-xl border p-4 shadow-sm"
+            style={{ backgroundColor: panelBg, borderColor: panelBorder }}
+          >
+            <p className="text-sm" style={{ color: subText }}>{item.label}</p>
             <div className="flex items-baseline justify-between mt-2">
-              <span className="text-2xl font-semibold text-gray-900">{item.value}</span>
-              <span className="text-sm">{item.delta}</span>
+              <span className="text-2xl font-semibold" style={{ color: panelText }}>{item.value}</span>
+              <span className={`text-sm ${item.deltaClass ?? ''}`} style={{ color: item.deltaClass ? undefined : subText }}>
+                {item.delta}
+              </span>
             </div>
           </div>
         ))}

@@ -1,5 +1,6 @@
 import { TrendingUp, Droplet, Milk, Gauge } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, BarChart, Bar } from 'recharts';
+import { useSettings } from '../context/SettingsContext';
 
 const weekly = [
   { label: '11.11', litri: 2860 },
@@ -24,31 +25,49 @@ const cowTable = [
 ];
 
 export function ProizvodnaMlijeka() {
+  const { isDarkMode } = useSettings();
+
+  const cardBg = isDarkMode ? '#0f1727' : '#ffffff';
+  const cardBorder = isDarkMode ? '#1c2436' : '#e5e7eb';
+  const cardText = isDarkMode ? '#e7eefc' : '#0f1727';
+  const subText = isDarkMode ? '#b9c7e3' : '#4b5563';
+  const badgeText = isDarkMode ? '#9ad8a8' : '#0f766e';
+
   const kpi = [
-    { icon: Milk, label: 'Ukupno (30d)', value: '93.6k L', badge: '+8.5% vs prethodni period', tone: 'text-green-600 bg-green-50 border-green-100' },
-    { icon: Droplet, label: 'Prosjek po grlu', value: '31.8 L', badge: 'Target 30 L', tone: 'text-blue-600 bg-blue-50 border-blue-100' },
-    { icon: Gauge, label: 'Kvalitet mlijeka', value: '96.8 /100', badge: 'Stabilno', tone: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
-    { icon: TrendingUp, label: 'Trend sedmica', value: '+8.5%', badge: 'Posljednjih 5 sedmica', tone: 'text-purple-600 bg-purple-50 border-purple-100' },
+    { icon: Milk, label: 'Ukupno (30d)', value: '93.6k L', badge: '+8.5% vs prethodni period' },
+    { icon: Droplet, label: 'Prosjek po grlu', value: '31.8 L', badge: 'Target 30 L' },
+    { icon: Gauge, label: 'Kvalitet mlijeka', value: '96.8 /100', badge: 'Stabilno' },
+    { icon: TrendingUp, label: 'Trend sedmica', value: '+8.5%', badge: 'Posljednjih 5 sedmica' },
   ];
 
   return (
-    <div className="p-6 md:p-8 space-y-8">
+    <div className="p-6 md:p-8 space-y-8" style={{ color: cardText }}>
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Proizvodnja mlijeka</h1>
-        <p className="text-gray-600 mt-1">Evidencija, trendovi i raspodjela po sesijama</p>
+        <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Proizvodnja mlijeka</h1>
+        <p className={`mt-1 ${isDarkMode ? 'text-slate-200' : 'text-gray-600'}`}>Evidencija, trendovi i raspodjela po sesijama</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {kpi.map(({ icon: Icon, label, value, badge, tone }) => (
-          <div key={label} className={`rounded-xl border ${tone} p-4 shadow-sm`}> 
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-white/80 flex items-center justify-center border border-current/20">
-                <Icon className="h-5 w-5" />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6">
+        {kpi.map(({ icon: Icon, label, value, badge }) => (
+          <div
+            key={label}
+            className="rounded-xl border p-5 shadow-lg"
+            style={{ backgroundColor: cardBg, borderColor: cardBorder, color: cardText }}
+          > 
+            <div className="flex items-center gap-3 pl-4">
+              <div
+                className="h-10 w-10 rounded-lg flex items-center justify-center border text-white"
+                style={{
+                  backgroundColor: isDarkMode ? 'rgba(255,255,255,0.15)' : '#0f1727',
+                  borderColor: isDarkMode ? 'rgba(255,255,255,0.35)' : '#0f1727',
+                }}
+              >
+                <Icon className="h-5 w-5 drop-shadow" style={{ color: '#ffffff', opacity: 1 }} />
               </div>
               <div>
-                <p className="text-sm text-gray-600">{label}</p>
-                <p className="text-2xl font-semibold text-gray-900">{value}</p>
-                <p className="text-xs mt-1">{badge}</p>
+                <p className="text-sm leading-tight" style={{ color: subText }}>{label}</p>
+                <p className="text-2xl font-semibold leading-snug" style={{ color: cardText }}>{value}</p>
+                <p className="text-xs mt-1 leading-tight" style={{ color: badgeText }}>{badge}</p>
               </div>
             </div>
           </div>

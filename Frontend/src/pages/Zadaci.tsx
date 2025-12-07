@@ -1,8 +1,10 @@
 import { useData } from '../context/DataContext';
+import { useSettings } from '../context/SettingsContext';
 import { CheckSquare, Clock, AlertCircle } from 'lucide-react';
 
 export function Zadaci() {
   const { zadaci, ažurirajZadatak } = useData();
+  const { formatDate } = useSettings();
 
   const handlePromjeniStatus = (id: string, noviStatus: 'novo' | 'u-toku' | 'završeno') => {
     ažurirajZadatak(id, { status: noviStatus });
@@ -96,7 +98,7 @@ export function Zadaci() {
                     
                     <span className="flex items-center gap-1 text-xs text-gray-500">
                       <Clock className="w-3 h-3" />
-                      Rok: {new Date(zadatak.rokIzvršenja).toLocaleDateString('bs-BA')}
+                      Rok: {formatDate(zadatak.rokIzvršenja)}
                     </span>
                     
                     {zadatak.dodijeljeno && (
