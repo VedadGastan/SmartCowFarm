@@ -1,12 +1,299 @@
+import { useMemo, useState } from 'react';
+import { Calendar, Download, FileText, Filter, LineChart as LineIcon, Printer, Share2 } from 'lucide-react';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+
+const milkTrend = [
+  { date: '11.11', liters: 2860 },
+  { date: '18.11', liters: 2940 },
+  { date: '25.11', liters: 3015 },
+  { date: '02.12', liters: 3090 },
+  { date: '07.12', liters: 3185 },
+];
+
+const topCows = [
+  { name: 'Slavica (BOS-001)', avg: 32.5 },
+  { name: 'Milica (BOS-002)', avg: 29.8 },
+  { name: 'Ruža (BOS-003)', avg: 30.8 },
+  { name: 'Daisy (C002)', avg: 28.3 },
+  { name: 'Bella (C001)', avg: 32.5 },
+];
+
+const healthSplit = [
+  { name: 'Zdrave', value: 112, color: '#10b981' },
+  { name: 'Manji problemi', value: 8, color: '#f59e0b' },
+  { name: 'Na liječenju', value: 3, color: '#ef4444' },
+];
+
+const recentReports = [
+  { title: 'Mjesecni izvještaj proizvodnje', date: '07.12.2025', size: '2.4 MB', type: 'PDF' },
+  { title: 'Zdravlje i tretmani - novembar', date: '30.11.2025', size: '1.2 MB', type: 'PDF' },
+  { title: 'Senzori i okolina - Q4', date: '25.11.2025', size: '1.9 MB', type: 'CSV' },
+  { title: 'Produktivnost zadataka', date: '20.11.2025', size: '1.1 MB', type: 'PDF' },
+];
+
+const tableRows = [
+  { id: 'R-2025-12-01', naziv: 'Produkcija mlijeka – novembar', period: '01–30.11.2025', status: 'Spremno', tip: 'PDF', trend: '+4.8%' },
+  { id: 'R-2025-11-28', naziv: 'Zdravlje i tretmani – Q4', period: '01.10–28.11.2025', status: 'Spremno', tip: 'PDF', trend: '+2.1%' },
+  { id: 'R-2025-11-25', naziv: 'Senzori i okolina – Q4', period: '01.10–25.11.2025', status: 'Spremno', tip: 'CSV', trend: 'Stabilno' },
+  { id: 'R-2025-11-20', naziv: 'Produktivnost zadataka – novembar', period: '01–20.11.2025', status: 'Spremno', tip: 'PDF', trend: '+1.4%' },
+];
+
 export function Izvjestaji() {
+  const [range, setRange] = useState('last-30');
+  const [type, setType] = useState('milk');
+
+  const kpi = useMemo(() => ([
+    { label: 'Ukupna proizvodnja', value: '93.6k L', delta: '+8.5%', tone: 'text-green-600 bg-green-50 border-green-100' },
+    { label: 'Prosjek po grlu', value: '31.8 L', delta: 'Odlično', tone: 'text-blue-600 bg-blue-50 border-blue-100' },
+    { label: 'Kvalitet mlijeka', value: '96.8 /100', delta: 'Stabilno', tone: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
+    { label: 'Zdravstveni score', value: '92 /100', delta: 'Uzlazno', tone: 'text-purple-600 bg-purple-50 border-purple-100' },
+  ]), []);
+
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Izvještaji</h1>
-        <p className="text-gray-600 mt-1">Generisanje i pregled izvještaja o radu farme</p>
+    <div className="p-6 md:p-8 space-y-8">
+      {/* Header + actions */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Izvještaji</h1>
+          <p className="text-gray-600 mt-1">Pregled, izvoz i print ključnih metrika farme</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50">
+            <Share2 className="w-4 h-4" /> Podijeli
+          </button>
+          <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50">
+            <Download className="w-4 h-4" /> Export PDF
+          </button>
+          <button className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-600 to-blue-600 px-4 py-2 text-white shadow-md hover:from-green-700 hover:to-blue-700">
+            <Printer className="w-4 h-4" /> Print verzija
+          </button>
+        </div>
       </div>
-      <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-        <p className="text-gray-500 text-lg">Stranica u izradi...</p>
+
+      {/* Filters */}
+      <div className="grid gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:grid-cols-3">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Tip izvještaja</label>
+          <select
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+          >
+            <option value="milk">Proizvodnja mlijeka</option>
+            <option value="health">Zdravlje i tretmani</option>
+            <option value="sensors">Senzori i okolina</option>
+            <option value="tasks">Produktivnost zadataka</option>
+            <option value="annual">Godišnji pregled</option>
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Period</label>
+          <div className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2">
+            <Calendar className="w-4 h-4 text-gray-500" />
+            <select
+              className="w-full bg-transparent focus:outline-none"
+              value={range}
+              onChange={(e) => setRange(e.target.value)}
+            >
+              <option value="last-7">Posljednjih 7 dana</option>
+              <option value="last-30">Posljednjih 30 dana</option>
+              <option value="last-90">Posljednjih 90 dana</option>
+              <option value="ytd">Godina do danas</option>
+              <option value="custom">Prilagođeni raspon</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="space-y-3 md:pt-6">
+          <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+            <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1"><Filter className="w-4 h-4" /> Zona B1/B2</span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1">Grupa: Muža</span>
+          </div>
+          <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50">
+            <LineIcon className="w-4 h-4" /> Generiši pregled
+          </button>
+        </div>
+      </div>
+
+      {/* KPI cards */}
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {kpi.map((item) => (
+          <div key={item.label} className={`rounded-xl border ${item.tone} p-4 shadow-sm`}>
+            <p className="text-sm text-gray-600">{item.label}</p>
+            <div className="flex items-baseline justify-between mt-2">
+              <span className="text-2xl font-semibold text-gray-900">{item.value}</span>
+              <span className="text-sm">{item.delta}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts row */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Trend proizvodnje (sedmični)</h3>
+              <p className="text-sm text-gray-600">Litara po sedmici, zadnjih 5 sedmica</p>
+            </div>
+            <span className="rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">+8.5%</span>
+          </div>
+          <ResponsiveContainer width="100%" height={320}>
+            <LineChart data={milkTrend}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="date" stroke="#6b7280" />
+              <YAxis stroke="#6b7280" />
+              <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8 }} />
+              <Line type="monotone" dataKey="liters" stroke="#10b981" strokeWidth={3} dot={{ r: 5, fill: '#10b981' }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Distribucija zdravlja stada</h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie data={healthSplit} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4}>
+                {healthSplit.map((item) => (
+                  <Cell key={item.name} fill={item.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="mt-4 space-y-2 text-sm">
+            {healthSplit.map((item) => (
+              <div key={item.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full" style={{ background: item.color }}></span>
+                  <span className="text-gray-700">{item.name}</span>
+                </div>
+                <span className="font-medium text-gray-900">{item.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Secondary charts */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Top krave po prosjeku</h3>
+            <span className="text-sm text-gray-500">Litara/dan</span>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={topCows}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="name" stroke="#6b7280" tick={{ fontSize: 12 }} />
+              <YAxis stroke="#6b7280" />
+              <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8 }} />
+              <Bar dataKey="avg" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Brzi sažetak</h3>
+            <span className="text-sm text-gray-500">Automatska analiza</span>
+          </div>
+          <ul className="space-y-3 text-sm text-gray-700">
+            <li className="flex items-start gap-3">
+              <span className="mt-1 h-2 w-2 rounded-full bg-green-500"></span>
+              Proizvodnja je +8.5% u odnosu na prethodni period, uz stabilan kvalitet (96.8/100).
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-1 h-2 w-2 rounded-full bg-blue-500"></span>
+              Top 3 krave (Slavica, Bella, Ruža) generišu 42% ukupnog prinosa – preporuka: pratiti njihovu ishranu.
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-1 h-2 w-2 rounded-full bg-amber-500"></span>
+              Zdravstvena struktura: 8 manjih slučajeva, 3 na liječenju – plan kontrolnog pregleda za grupu C.
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="mt-1 h-2 w-2 rounded-full bg-purple-500"></span>
+              Preporuka za naredni izvještaj: dodati korelaciju senzora (temperatura/vlažnost) sa padom proizvodnje u zoni C2.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Posljednji generisani izvještaji</h3>
+            <p className="text-sm text-gray-600">Spremni za preuzimanje ili štampu</p>
+          </div>
+          <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50">
+            <FileText className="w-4 h-4" /> Novi izvještaj
+          </button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-left text-gray-600">
+              <tr>
+                <th className="px-6 py-3 font-medium">ID</th>
+                <th className="px-6 py-3 font-medium">Naziv</th>
+                <th className="px-6 py-3 font-medium">Period</th>
+                <th className="px-6 py-3 font-medium">Status</th>
+                <th className="px-6 py-3 font-medium text-right">Trend</th>
+                <th className="px-6 py-3 font-medium text-right">Akcije</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {tableRows.map((row) => (
+                <tr key={row.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-3 text-gray-900">{row.id}</td>
+                  <td className="px-6 py-3 text-gray-900">{row.naziv}</td>
+                  <td className="px-6 py-3 text-gray-600">{row.period}</td>
+                  <td className="px-6 py-3">
+                    <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">{row.status}</span>
+                  </td>
+                  <td className="px-6 py-3 text-right text-gray-900">{row.trend}</td>
+                  <td className="px-6 py-3 text-right">
+                    <div className="inline-flex items-center gap-2">
+                      <button className="rounded-lg border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-50">PDF</button>
+                      <button className="rounded-lg border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-50">CSV</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Recent downloads */}
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Brzi pristup</h3>
+          <span className="text-sm text-gray-500">Najnoviji exporti</span>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {recentReports.map((r) => (
+            <div key={r.title} className="rounded-lg border border-gray-200 p-4 hover:shadow-sm transition-shadow">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="h-10 w-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">{r.title}</p>
+                    <p className="text-xs text-gray-500">{r.date}</p>
+                  </div>
+                </div>
+                <span className="text-xs text-gray-500">{r.type}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <span>{r.size}</span>
+                <button className="text-green-600 hover:text-green-700">Preuzmi</button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

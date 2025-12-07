@@ -68,7 +68,7 @@ export function NavigacijskaSideBar() {
   const { odjava } = useAuth();
 
   return (
-	<aside className="h-screen w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm">
+	<aside className="sticky top-0 z-30 flex h-screen w-64 shrink-0 flex-col border-r border-gray-200 bg-white shadow-sm">
       {/* Logo */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center gap-3">
