@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Calendar, Download, FileText, Filter, LineChart as LineIcon, Printer, Share2 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { useData } from '../context/DataContext';
 
 const milkTrend = [
   { date: '11.11', liters: 2860 },
@@ -16,12 +17,6 @@ const topCows = [
   { name: 'Ruža (BOS-003)', avg: 30.8 },
   { name: 'Daisy (C002)', avg: 28.3 },
   { name: 'Bella (C001)', avg: 32.5 },
-];
-
-const healthSplit = [
-  { name: 'Zdrave', value: 112, color: '#10b981' },
-  { name: 'Manji problemi', value: 8, color: '#f59e0b' },
-  { name: 'Na liječenju', value: 3, color: '#ef4444' },
 ];
 
 const recentReports = [
@@ -41,6 +36,18 @@ const tableRows = [
 export function Izvjestaji() {
   const [range, setRange] = useState('last-30');
   const [type, setType] = useState('milk');
+  const { krave } = useData();
+
+  const healthSplit = useMemo(() => ([
+    { name: 'Zdrave', value: krave.filter(k => k.status === 'zdrava').length, color: '#10b981' },
+    { name: 'Manji problemi', value: krave.filter(k => k.status === 'praćenje').length, color: '#f59e0b' },
+    { name: 'Na liječenju', value: krave.filter(k => k.status === 'lijecenje').length, color: '#ef4444' },
+  ]), [krave]);
+
+  const ukupnoZdravlje = useMemo(
+    () => healthSplit.reduce((sum, item) => sum + item.value, 0),
+    [healthSplit]
+  );
 
   const kpi = useMemo(() => ([
     { label: 'Ukupna proizvodnja', value: '93.6k L', delta: '+8.5%', tone: 'text-green-600 bg-green-50 border-green-100' },
@@ -130,7 +137,7 @@ export function Izvjestaji() {
       </div>
 
       {/* Charts row */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3 mt-2">
         <div className="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -159,7 +166,13 @@ export function Izvjestaji() {
                   <Cell key={item.name} fill={item.color} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip
+                formatter={(value, name) => {
+                  const broj = Number(value);
+                  const procenat = ukupnoZdravlje > 0 ? Math.round((broj / ukupnoZdravlje) * 100) : 0;
+                  return [`${broj} (${procenat}%)`, name as string];
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
           <div className="mt-4 space-y-2 text-sm">
